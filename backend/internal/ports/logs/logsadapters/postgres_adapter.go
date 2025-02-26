@@ -17,11 +17,18 @@ func NewLogRecordRepositoryDB(DBInstance *postgres.DBInstance) *LogRecordReposit
 	return &LogRecordRepositoryDB{DBInstance: DBInstance}
 }
 
-func (l LogRecordRepositoryDB) ListAll(ctx context.Context) ([]models.LogRecord, error) {
-	query := `SELECT "name", "result", "datetime" from log_records ORDER BY "datetime" DESC`
+func (l LogRecordRepositoryDB) ListByName(ctx context.Context, nameFilter string) ([]models.LogRecord, error) {
+	var query string
+	var args pgx.NamedArgs
+	if len(nameFilter) > 0 {
+		query = `SELECT "name", "result", "datetime" from log_records WHERE "name"=@nameFilter ORDER BY "datetime" DESC`
+		args = pgx.NamedArgs{"nameFilter": nameFilter}
+	} else {
+		query = `SELECT "name", "result", "datetime" from log_records ORDER BY "datetime" DESC`
+	}
 
 	var result []models.LogRecord
-	rows, err := l.DBInstance.Db.Query(ctx, query)
+	rows, err := l.DBInstance.Db.Query(ctx, query, args)
 	if err != nil {
 		return result, fmt.Errorf("unable to select rows: %w", err)
 	}

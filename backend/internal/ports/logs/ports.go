@@ -7,7 +7,7 @@ import (
 )
 
 type LogRecordRepository interface {
-	ListAll(ctx context.Context) ([]models.LogRecord, error)
+	ListByName(ctx context.Context, nameFilter string) ([]models.LogRecord, error)
 	Create(ctx context.Context, record models.LogRecord) error
 	ClearAllBeforeDatetime(ctx context.Context, datetime time.Time) error
 }

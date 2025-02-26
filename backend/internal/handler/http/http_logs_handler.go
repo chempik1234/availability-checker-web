@@ -48,7 +48,8 @@ func (h LogsHttpHandler) NewLogsHandler() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		switch r.Method {
 		case http.MethodGet:
-			logsList, err := h.logsRepository.ListAll(r.Context())
+			nameFilter := r.URL.Query().Get("name_filter")
+			logsList, err := h.logsRepository.ListByName(r.Context(), nameFilter)
 			if err != nil {
 				w.WriteHeader(http.StatusInternalServerError)
 				_, _ = w.Write([]byte(fmt.Errorf("Failed to retrieve data from DB: %v", err.Error()).Error()))
